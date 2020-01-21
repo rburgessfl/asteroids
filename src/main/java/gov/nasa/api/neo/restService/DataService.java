@@ -1,9 +1,13 @@
-package gov.nasa.api.neo;
+package gov.nasa.api.neo.restService;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
+
+import java.util.Objects;
 
 @Component
 public class DataService{
@@ -17,12 +21,12 @@ public class DataService{
     public String fetch() {
         ResponseEntity<String> response = restTemplate.getForEntity(
                 ("https://api.nasa.gov/neo/rest/v1/neo/browse?page="+page+"&api_key="+apiKey), String.class);
-        String responseBody = response.getBody();
-        String dataPackage = responseBody.substring(responseBody.indexOf("near_earth_objects"));
-        dataPackage = dataPackage.substring(dataPackage.indexOf(":")+1);
-        int end = dataPackage.length()-1;
 
-        System.out.println(dataPackage.substring(0, end));
-        return dataPackage.substring(0, end);
+        JSONObject dataPackage = new JSONObject(Objects.requireNonNull(response.getBody()));
+        JSONArray nearEarthObjects = dataPackage.getJSONArray("near_earth_objects");
+
+        System.out.println(nearEarthObjects);
+
+        return "Success";
     }
 }
